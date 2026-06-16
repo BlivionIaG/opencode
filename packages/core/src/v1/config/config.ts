@@ -19,6 +19,27 @@ import { ConfigSkillsV1 } from "./skills"
 
 export type Layout = ConfigLayoutV1.Layout
 
+export const ProxyConfig = Schema.Struct({
+  http: Schema.optional(Schema.String).annotate({
+    description: "HTTP proxy URL (e.g. http://proxy.example.com:8080)",
+  }),
+  https: Schema.optional(Schema.String).annotate({
+    description: "HTTPS proxy URL (e.g. http://proxy.example.com:8080)",
+  }),
+  all: Schema.optional(Schema.String).annotate({
+    description: "Proxy for all protocols (e.g. socks5://proxy.example.com:1080)",
+  }),
+  no_proxy: Schema.optional(Schema.mutable(Schema.Array(Schema.String))).annotate({
+    description: "Hosts to bypass proxy (e.g. localhost, 127.0.0.1, ::1)",
+  }),
+}).annotate({ identifier: "ProxyConfig" })
+
+export const NetworkConfig = Schema.Struct({
+  proxy: Schema.optional(ProxyConfig).annotate({
+    description: "Explicit proxy configuration for OpenCode network requests",
+  }),
+}).annotate({ identifier: "NetworkConfig" })
+
 export const WellKnown = Schema.Struct({
   config: Schema.optional(Schema.Json),
   remote_config: Schema.optional(Schema.Json),
@@ -184,6 +205,9 @@ export const Info = Schema.Struct({
       }),
     }),
   ),
+  network: Schema.optional(NetworkConfig).annotate({
+    description: "Network configuration including proxy settings",
+  }),
 }).annotate({ identifier: "Config" })
 
 export type Info = DeepMutable<Schema.Schema.Type<typeof Info>>
